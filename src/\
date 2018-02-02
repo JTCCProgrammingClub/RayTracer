@@ -1,0 +1,133 @@
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <iostream>
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow *window);
+
+void rayTracer();
+void render();
+
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+//Compute shader
+GLuint compute_shader;
+GLuint compute_program;
+
+static const GLchar * compute_source[] = 
+{
+"#version 450 core \n"
+"layout (local_size_x = 8, local_size_y = 8) in; \n"
+"void main(void) \n"
+" {  // Do nothing \n"
+"}  \n"
+};
+
+//Texture initialization
+int texWidth = 800;
+int textHeight = 600;
+GLuint tex_output;
+
+int main()
+{
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // glfw window creation
+    // --------------------
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    // glad: load all OpenGL function pointers
+    // ---------------------------------------
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }    
+
+	//Texture compute program will draw to and render program
+	//will read from
+	glGenTextures(1, &tex_output);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex_output);
+	/*
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	*/
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, texWidth, textHeight,
+			0, GL_RGBA, GL_FLOAT, NULL);
+	glBindImageTexture(0, tex_output, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+	// Create a shader, attach source, and compile.
+	compute_shader = glCreateShader(GL_COMPUTE_SHADER);
+	glShaderSource(compute_shader, 1, compute_source, NULL);
+	glCompileShader(compute_shader);
+
+	// Create a program, attach shader, link.
+	compute_program = glCreateProgram();
+	glAttachShader(compute_program, compute_shader);
+	glLinkProgram(compute_program);
+
+	glDeleteShader(compute_shader);
+
+	glUseProgram(compute_shader);
+    
+    glUniform1i(glGetUniformLocation(compute_shader, "tex_output"), 0);
+
+
+
+    while (!glfwWindowShouldClose(window))
+    {
+        processInput(window);
+
+
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // -------------------------------------------------------------------------------
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return 0;
+}
+
+void rayTracer(){
+	glUseProgram(compute_shader);
+	glDispatchCompute(32,32,1);
+}
+
+void render(){
+
+}
+
+void processInput(GLFWwindow *window)
+{
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
