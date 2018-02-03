@@ -8,10 +8,11 @@
 #define WIN_HEIGHT 600;
 
 //Texture initialization
-const int texWidth = WIN_WIDTH;
-const int textHeight = WIN_HEIGHT;
+//const int texWidth = WIN_WIDTH;
+//const int textHeight = WIN_HEIGHT;
 //GLuint tex;
 
 GLuint genTexture();
 
 #endif
+

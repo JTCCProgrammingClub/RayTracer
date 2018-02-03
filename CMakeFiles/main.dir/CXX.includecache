@@ -25,10 +25,14 @@ initApp.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp
 programs.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
+iostream
+-
 
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/render.cpp
 programs.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
+iostream
+-
 
 /usr/local/include/GLFW/glfw3.h
 stddef.h

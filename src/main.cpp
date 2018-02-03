@@ -54,6 +54,7 @@ int main()
 	// init render prog
 	renderProg  = genRenderProg();	
 
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -63,8 +64,10 @@ int main()
         //glClear(GL_COLOR_BUFFER_BIT);
 
 		useRayTracerProg();
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 		useRenderProg();
 
+ 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -79,12 +82,16 @@ int main()
 void useRayTracerProg(){
 	glUseProgram(rayTracerProg);
 
-	glUniform1f(glGetUniformLocation(rayTracerProg, "roll"), (float)512*0.01f);
-	glDispatchCompute(512/16, 512/16, 1); // 512^2 threads in blocks of 16^2
+	glUniform1f(glGetUniformLocation(rayTracerProg, "roll"), (float)256*0.01f);
+	glDispatchCompute(512, 512, 1); // 512^2 threads in blocks of 16^2
 }
 
 void useRenderProg(){
+    glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(renderProg);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texHandle);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

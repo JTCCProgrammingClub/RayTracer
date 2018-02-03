@@ -1,6 +1,5 @@
 #include "programs.h"
-
-
+#include <iostream>
 
 //GLuint genRenderProg(GLuint texHandle){
 GLuint genRenderProg(){
@@ -25,7 +24,7 @@ GLuint genRenderProg(){
 		 out vec4 color;\
 		 void main() {\
 			 float c = texture(srcTex, texCoord).x;\
-			 color = vec4(c, 1.0, 1.0, 1.0);\
+			 color = texture(srcTex, texCoord);\
 		 }"
 	};
 
@@ -33,16 +32,26 @@ GLuint genRenderProg(){
 	glShaderSource(fp, 2, fpSrc, NULL);
 
 	glCompileShader(vp);
-	glCompileShader(fp);
-
 	glAttachShader(progHandle, vp);
+
+	glCompileShader(fp);
 	glAttachShader(progHandle, fp);
 
 	glBindFragDataLocation(progHandle, 0,  "color");
 	glLinkProgram(progHandle);
 
-	glUseProgram(progHandle);
+	int rvalue;
+    glGetProgramiv(progHandle, GL_LINK_STATUS, &rvalue);
+    if (!rvalue) {
+        fprintf(stderr, "Error in linking compute shader program\n");
+        GLchar log[10240];
+        GLsizei length;
+        glGetProgramInfoLog(progHandle, 10239, &length, log);
+        fprintf(stderr, "Linker log:\n%s\n", log);
+		std::exit(41);
+    }   
 
+	glUseProgram(progHandle);
 	//associate our texture with srcTex input var in the shader
 	glUniform1i(glGetUniformLocation(progHandle, "srcTex"),  0);
 
@@ -75,3 +84,4 @@ void initRenderProg(){
 	glUseProgram(progHandle);
 
 }
+*/
