@@ -1,4 +1,5 @@
 #include "programs.h"
+#include "shader.h"
 #include <iostream>
 
 //GLuint genRenderProg(GLuint texHandle){
@@ -52,6 +53,7 @@ GLuint genRenderProg(){
     }   
 
 	glUseProgram(progHandle);
+
 	//associate our texture with srcTex input var in the shader
 	glUniform1i(glGetUniformLocation(progHandle, "srcTex"),  0);
 

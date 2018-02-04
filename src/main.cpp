@@ -8,14 +8,13 @@ void processInput(GLFWwindow *window);
 void useRayTracerProg();
 void useRenderProg();
 
-const unsigned int SCR_WIDTH = WIN_WIDTH;
-const unsigned int SCR_HEIGHT = WIN_HEIGHT;
-
 //Our programs
 GLuint renderProg;
 GLuint rayTracerProg;
 
-GLuint texHandle  ;
+//the screen (a texture) our compute shader will draw too,
+//and our frag will read from
+GLuint screen;
 
 int main()
 {
@@ -28,7 +27,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "hey.", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -46,28 +45,21 @@ int main()
         return -1;
     }    
 
-	texHandle  = genTexture();
-
+	//init our screen
+	screen = genScreen();
 	// init rayTracer prog
 	rayTracerProg  = genRayTracerProg();	
-
 	// init render prog
 	renderProg  = genRenderProg();	
-
 
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
-
-
         //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         //glClear(GL_COLOR_BUFFER_BIT);
-
 		useRayTracerProg();
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 		useRenderProg();
-
- 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -91,7 +83,7 @@ void useRenderProg(){
 	glUseProgram(renderProg);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texHandle);
+    glBindTexture(GL_TEXTURE_2D, screen);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

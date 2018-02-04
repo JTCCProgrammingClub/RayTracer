@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/initApp.h
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/app.h
 glad/glad.h
 -
 GLFW/glfw3.h
@@ -19,8 +19,8 @@ programs.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
 
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
-initApp.h
-/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/initApp.h
+app.h
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/app.h
 
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp
 programs.h
@@ -31,7 +31,21 @@ iostream
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/render.cpp
 programs.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
+shader.h
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.h
 iostream
+-
+
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.h
+app.h
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/app.h
+iostream
+-
+fstream
+-
+string
+-
+sstream
 -
 
 /usr/local/include/GLFW/glfw3.h

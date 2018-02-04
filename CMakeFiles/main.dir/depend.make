@@ -5,23 +5,24 @@ CMakeFiles/main.dir/src/glad.c.o: src/glad.c
 CMakeFiles/main.dir/src/glad.c.o: /usr/local/include/KHR/khrplatform.h
 CMakeFiles/main.dir/src/glad.c.o: /usr/local/include/glad/glad.h
 
-CMakeFiles/main.dir/src/main.cpp.o: src/initApp.h
+CMakeFiles/main.dir/src/main.cpp.o: src/app.h
 CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp
 CMakeFiles/main.dir/src/main.cpp.o: src/programs.h
 CMakeFiles/main.dir/src/main.cpp.o: /usr/local/include/GLFW/glfw3.h
 CMakeFiles/main.dir/src/main.cpp.o: /usr/local/include/KHR/khrplatform.h
 CMakeFiles/main.dir/src/main.cpp.o: /usr/local/include/glad/glad.h
 
-CMakeFiles/main.dir/src/rayTracer.cpp.o: src/initApp.h
+CMakeFiles/main.dir/src/rayTracer.cpp.o: src/app.h
 CMakeFiles/main.dir/src/rayTracer.cpp.o: src/programs.h
 CMakeFiles/main.dir/src/rayTracer.cpp.o: src/rayTracer.cpp
 CMakeFiles/main.dir/src/rayTracer.cpp.o: /usr/local/include/GLFW/glfw3.h
 CMakeFiles/main.dir/src/rayTracer.cpp.o: /usr/local/include/KHR/khrplatform.h
 CMakeFiles/main.dir/src/rayTracer.cpp.o: /usr/local/include/glad/glad.h
 
-CMakeFiles/main.dir/src/render.cpp.o: src/initApp.h
+CMakeFiles/main.dir/src/render.cpp.o: src/app.h
 CMakeFiles/main.dir/src/render.cpp.o: src/programs.h
 CMakeFiles/main.dir/src/render.cpp.o: src/render.cpp
+CMakeFiles/main.dir/src/render.cpp.o: src/shader.h
 CMakeFiles/main.dir/src/render.cpp.o: /usr/local/include/GLFW/glfw3.h
 CMakeFiles/main.dir/src/render.cpp.o: /usr/local/include/KHR/khrplatform.h
 CMakeFiles/main.dir/src/render.cpp.o: /usr/local/include/glad/glad.h

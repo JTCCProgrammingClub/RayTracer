@@ -2,7 +2,7 @@
 
 #define _PROGRAMS_H
 
-#include "initApp.h"
+#include "app.h"
 
 GLuint genRenderProg();
 GLuint genRayTracerProg();

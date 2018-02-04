@@ -1,7 +1,7 @@
 #include "programs.h"
 #include <iostream>
 
-GLuint genTexture(){
+GLuint genScreen(){
 	GLuint texHandle;
 	glGenTextures(1, &texHandle);
 
@@ -16,6 +16,7 @@ GLuint genTexture(){
 	glBindImageTexture(0, texHandle, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
 	return texHandle;
 }
+
 GLuint genRayTracerProg(){
 	GLuint progHandle = glCreateProgram();
 	GLuint cs = glCreateShader(GL_COMPUTE_SHADER);

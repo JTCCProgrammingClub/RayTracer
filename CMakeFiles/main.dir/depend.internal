@@ -6,23 +6,24 @@ CMakeFiles/main.dir/src/glad.c.o
  /usr/local/include/KHR/khrplatform.h
  /usr/local/include/glad/glad.h
 CMakeFiles/main.dir/src/main.cpp.o
- /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/initApp.h
+ /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/app.h
  /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/main.cpp
  /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
  /usr/local/include/GLFW/glfw3.h
  /usr/local/include/KHR/khrplatform.h
  /usr/local/include/glad/glad.h
 CMakeFiles/main.dir/src/rayTracer.cpp.o
- /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/initApp.h
+ /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/app.h
  /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
  /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp
  /usr/local/include/GLFW/glfw3.h
  /usr/local/include/KHR/khrplatform.h
  /usr/local/include/glad/glad.h
 CMakeFiles/main.dir/src/render.cpp.o
- /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/initApp.h
+ /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/app.h
  /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
  /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/render.cpp
+ /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.h
  /usr/local/include/GLFW/glfw3.h
  /usr/local/include/KHR/khrplatform.h
  /usr/local/include/glad/glad.h

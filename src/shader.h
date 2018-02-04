@@ -1,8 +1,6 @@
-#pragma once
+#include "app.h"
 
-#include<glad\glad.h>
-
-#include "ErrorLogger.h"
+//#include "ErrorLogger.h"
 
 #include <iostream>
 #include <fstream>
@@ -15,13 +13,10 @@ class Shader
 {
 public:
 
-	GLuint program;
+	Shader(const std::string& shaderFilePath,
+		GLuint program, GLenum shaderType);
 
-	Shader(const std::string& vertexShaderFilepath, const std::string& fragmentShaderFilepath)
-	{
-		std::string vertexShaderSource;
-		std::string fragmentShaderSource;
-
+		/*
 		// Not rendered
 		// std::string computeShaderSource;
 
@@ -41,34 +36,35 @@ public:
 		// Create vertex shader
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		const char* vss = vertexShaderSource.c_str();
-		GLCall(glShaderSource(vertexShader, 1, &vss, nullptr));
-		GLCall(glCompileShader(vertexShader));
+		glShaderSource(vertexShader, 1, &vss, nullptr);
+		glCompileShader(vertexShader);
 
 		// Create fragment shader
 		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		const char* fss = fragmentShaderSource.c_str();
-		GLCall(glShaderSource(fragmentShader, 1, &fss, nullptr));
-		GLCall(glCompileShader(fragmentShader));
+		glShaderSource(fragmentShader, 1, &fss, nullptr);
+		glCompileShader(fragmentShader);
 
 		// TODO: Write code for compute shader
 
 		// Create shader program
 		program = glCreateProgram();
 
-		GLCall(glAttachShader(program, vertexShader));
-		GLCall(glAttachShader(program, fragmentShader));
-		GLCall(glLinkProgram(program));
-		GLCall(glValidateProgram(program));
+		glAttachShader(program, vertexShader);
+		glAttachShader(program, fragmentShader);
+		glLinkProgram(program);
+		glValidateProgram(program);
 
-		GLCall(glDeleteShader(vertexShader));
-		GLCall(glDeleteShader(fragmentShader));
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
 
 	}
 
 	void UseProgram()
 	{
-		GLCall(glUseProgram(program));
+		glUseProgram(program);
 	}
+	*/
 
 private:
 
