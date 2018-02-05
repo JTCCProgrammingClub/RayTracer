@@ -1,4 +1,5 @@
 #include "programs.h"
+#include "shader.h"
 #include <iostream>
 
 GLuint genScreen(){
@@ -18,39 +19,11 @@ GLuint genScreen(){
 }
 
 GLuint genRayTracerProg(){
+	
 	GLuint progHandle = glCreateProgram();
-	GLuint cs = glCreateShader(GL_COMPUTE_SHADER);
+	Shader compShader("shaders/comp.glsl", progHandle, GL_COMPUTE_SHADER);
 
-	const char *csSrc[] = {
-		"#version 430\n",
-		"uniform float roll;\
-		layout(rgba32f, binding = 0) uniform image2D destTex;\
-		 layout (local_size_x = 1, local_size_y = 1) in;\
-		 void main() {\
-			 ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);\
-			 imageStore(destTex, storePos, vec4(1.0, 0.0, 0.0, 1.0));\
-		 }"
-	};
-
-	glShaderSource(cs, 2, csSrc, NULL);
-	glCompileShader(cs);
-
-	glAttachShader(progHandle, cs);
-	glLinkProgram(progHandle);
-
-
-	int rvalue;
-    glGetProgramiv(progHandle, GL_LINK_STATUS, &rvalue);
-    if (!rvalue) {
-        fprintf(stderr, "Error in linking compute shader program\n");
-        GLchar log[10240];
-        GLsizei length;
-        glGetProgramInfoLog(progHandle, 10239, &length, log);
-        fprintf(stderr, "Linker log:\n%s\n", log);
-		std::exit(41);
-    }   
-
-
+	// Initialize program
 	glUseProgram(progHandle);
 	glUniform1i(glGetUniformLocation(progHandle, "destTex"), 0);
 

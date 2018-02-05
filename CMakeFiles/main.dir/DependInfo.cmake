@@ -17,6 +17,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/main.cpp" "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles/main.dir/src/main.cpp.o"
   "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp" "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles/main.dir/src/rayTracer.cpp.o"
   "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/render.cpp" "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles/main.dir/src/render.cpp.o"
+  "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.cpp" "/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles/main.dir/src/shader.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

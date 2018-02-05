@@ -1,4 +1,4 @@
-#version 430,
+#version 430
 uniform float roll;
 
 layout(rgba32f, binding = 0) uniform image2D destTex;

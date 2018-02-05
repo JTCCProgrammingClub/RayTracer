@@ -25,6 +25,8 @@ app.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp
 programs.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/programs.h
+shader.h
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.h
 iostream
 -
 
@@ -35,6 +37,10 @@ shader.h
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.h
 iostream
 -
+
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.cpp
+shader.h
+/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.h
 
 /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.h
 app.h

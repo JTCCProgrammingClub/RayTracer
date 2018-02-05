@@ -1,10 +1,12 @@
 cmake_minimum_required (VERSION 3.9.0)
 
+
 project(RayTracer)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set (CMAKE_CXX_FLAGS "-D_GLIBCXX_DEBUG")
 set(CMAKE_BUILD_TYPE Debug)
 
 #include_directories(glad)
@@ -16,6 +18,7 @@ add_executable(main
     src/glad.c 
 	src/rayTracer.cpp
 	src/render.cpp
+	src/shader.cpp
 )
 include_directories(${GLFW_INCLUDE_DIRS} )
 target_link_libraries(main glfw)

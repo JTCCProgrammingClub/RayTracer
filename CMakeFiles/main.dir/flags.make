@@ -9,7 +9,7 @@ C_DEFINES =
 
 C_INCLUDES = -isystem /usr/local/include 
 
-CXX_FLAGS = -g  
+CXX_FLAGS = -D_GLIBCXX_DEBUG -g  
 
 CXX_DEFINES = 
 
