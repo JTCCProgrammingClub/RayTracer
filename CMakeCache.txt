@@ -253,6 +253,9 @@ glfw3_DIR:PATH=/usr/local/lib/cmake/glfw3
 //The directory containing a CMake configuration file for glfw.
 glfw_DIR:PATH=glfw_DIR-NOTFOUND
 
+//The directory containing a CMake configuration file for glm.
+glm_DIR:PATH=/usr/lib64/cmake/glm
+
 
 ########################
 # INTERNAL cache entries

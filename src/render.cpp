@@ -29,6 +29,7 @@ GLuint genRenderProg(){
 
 	float data[] = {
 		-1.0f, -1.0f,
+
 		-1.0f, 1.0f,
 		1.0f, -1.0f,
 		1.0f, 1.0f

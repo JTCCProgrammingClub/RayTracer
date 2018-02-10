@@ -4,8 +4,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-const unsigned int WIN_WIDTH = 800;
-const unsigned int WIN_HEIGHT = 600;
+const unsigned int WIN_WIDTH = 512;
+const unsigned int WIN_HEIGHT = 512;
+
+const int COMP_SIZE = 2048;
 
 //Texture initialization
 //GLuint tex;

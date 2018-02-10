@@ -1,6 +1,7 @@
-
 #include <iostream>
 #include "programs.h"
+#include <math.h>
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -16,9 +17,10 @@ GLuint rayTracerProg;
 //and our frag will read from
 GLuint screen;
 
+float i;
 int main()
+	
 {
-
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -27,7 +29,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "hey.", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "JTPCC", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -36,6 +38,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -73,9 +76,10 @@ int main()
 
 void useRayTracerProg(){
 	glUseProgram(rayTracerProg);
+	i+=.1f;
 
-	glUniform1f(glGetUniformLocation(rayTracerProg, "roll"), (float)256*0.01f);
-	glDispatchCompute(512, 512, 1); // 512^2 threads in blocks of 16^2
+	glUniform1i(glGetUniformLocation(rayTracerProg, "roll"),1);
+	glDispatchCompute(COMP_SIZE, COMP_SIZE, 1); // 
 }
 
 void useRenderProg(){
