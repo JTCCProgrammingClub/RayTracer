@@ -1,4 +1,7 @@
 #version 430
+precision highp float;
+precision highp int;
+
 uniform int roll;
 
 // What this shader will write to
@@ -37,15 +40,30 @@ struct object{
 	mat4 trans;
 } objects[3];
 
+struct intersection{
+	vec3 norm;
+	vec3 coord;
+};
+
 layout (local_size_x = 1, local_size_y = 1) in;
 
-vec3 transformVec(vec3 vec, mat4 trans){
-
-	vec4 vecTrans = vec4(vec.x, vec.y, vec.z, 1);
-	return (inverse(trans) * vecTrans).xyz;
+bool approx(vec3 val, vec3 compare, vec3 maxDiff){
+	return all(lessThan( abs(val - compare) , maxDiff));
 }
 
-vec3 intersectPlane(vec3 D, vec3 E){
+vec3 transformPoint(vec3 vec, mat4 trans){
+
+	vec4 vecTrans = vec4(vec.x, vec.y, vec.z, 1);
+	return ((trans) * vecTrans).xyz;
+}
+
+vec3 transformRay(vec3 ray, mat4 trans){
+
+	vec4 rayTrans = vec4(ray.x, ray.y, ray.z, 0);
+	return (inverse(transpose((trans))) * rayTrans).xyz;
+}
+
+intersection intersectPlane(vec3 D, vec3 E){
 	vec3 ray = normalize(D - E); // Ray's direction
 
 	vec3 N = (vec3(0,1,0));
@@ -54,39 +72,48 @@ vec3 intersectPlane(vec3 D, vec3 E){
 	float d = -dot(Q, N);
 	float v = dot(ray, N);
 	float t = (-(dot(E, N) + d) / v);
+	intersection intersec = intersection(D,D);
 
-	if(t>0)
-		return E + t*D;
-	else
-		return E;
+	if(t>0){
+		intersec.coord =  E + t*D;
+		intersec.norm = normalize(N);
+	}
+	return intersec;
 }
 
-vec3 intersectSphere(vec3 D, vec3 E){
-	float a = dot(D,D);
-	float b = dot(2*E,D);
+intersection intersectSphere(vec3 D, vec3 E){
+	vec3 ray = normalize(D-E);
+	float a = dot(ray,ray);
+	float b = 2*dot(E,ray);
 	float c = dot(E,E)-1;
+	intersection intersec = intersection(D,D);
 
 	float t1 =  (-b + sqrt(b*b -4*a*c))/2*a;
 	float t2 =  (-b - sqrt(b*b -4*a*c))/2*a;
 
-	if( (t1 > 0) && (t2 > 0) )
-		return (t1 > t2) ? E + t2*D : E + t1*D;
-	else if( t1 > 0 )
-		return E + t1*D;
-	else if( t2 > 0 )
-		return E + t2*D;
-	else
-		return E;
+	if(b*b -4*a*c < 0.0){
+		return intersec;
+	}
+	else if(b*b -4*a*c == 0.0){
+		intersec.coord =  (t1 > t2) ? E + t2*D : E + t1*D;
+		intersec.norm  = normalize(intersec.coord);
+	}
+	else {
+		intersec.coord =  E + t2*D;
+		intersec.norm  = normalize(intersec.coord);
+	}
+	return intersec;
 
 }
 
-vec3 intersectObject(vec3 D, vec3 E, int type){
+intersection intersectObject(vec3 D, vec3 E, int type){
 
 	switch(type){
 		case 1:
 			return intersectSphere(D, E);
 		case 2:
 			return intersectPlane(D, E);
+
 	}
 }
 
@@ -132,14 +159,14 @@ void main() {
 
 	end = start + 1000*normalize(end - start);
 
-	mat4 trans1 = (transpose(mat4(1.0, 0.0, 0.0, 1.1, 
-										  0.0, 1.0, 0.0, 2.0, 
-										  0.0, 0.0, 1.0,  0.0,  
+	mat4 trans1 = (transpose(mat4(1.0, 0.0, 0.0, 1.0, 
+										  0.0, 2.0, 0.0, 1.0, 
+										  0.0, 0.0, 1.0,  3.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
-	mat4 trans2 = (transpose(mat4(1.0, 0.0, 0.0, 0.0, 
-										  0.0, 1.0, 0.0, 0.0, 
-										  0.0, 0.0, 1.0,  3.0,  
+	mat4 trans2 = (transpose(mat4(2.0, 0.0, 0.0, 0.0, 
+										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 0.0, 1.0,  1.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
 	mat4 trans3 = (transpose(mat4(1.0, 0.0, 0.0, 0.0, 
@@ -148,7 +175,7 @@ void main() {
 										  0.0, 0.0, 0.0,  1.0)));
 	objects[0].type =1;
 	objects[0].trans =trans1;
-	objects[0].color = vec4(0,0,1,1);
+	objects[0].color = vec4(1,0,1,1);
 
 	objects[1].type =1;
 	objects[1].trans =trans2;
@@ -164,11 +191,13 @@ void main() {
 	int currReflect = 0;
 	int maxReflect = 4;
 	bool isDone = false;
-	int closestDist = 100000;
+	float closestDist = 100000;
 	object closestObj;
 	closestObj.type = -1;
+	intersection  closestIntersect;
 
-	vec4 ambientMask = vec4(.1, .1, .1, 1);
+	vec3 ambientMask = vec3(.2, .2, .2);
+	vec3 lightRay = normalize(vec3(1,1,0));
 
 	while(currReflect < maxReflect && !isDone){
 
@@ -176,22 +205,37 @@ void main() {
 		for(int i=0; i< objects.length; i++){
 
 			// Transform vectors in object's space to prep for testing
-			vec3 E = transformVec(start, objects[i].trans);
-			vec3 D = transformVec(end, objects[i].trans);
+			vec3 E = transformPoint(start, inverse(objects[i].trans));
+			vec3 D = transformPoint(end, inverse(objects[i].trans));
 
-			vec3 intersectCoord = intersectObject(D, E, objects[i].type);
+			intersection intersec = intersectObject(D, E, objects[i].type);
 
-			if(intersectCoord != E){
-				imageStore(destTex, texPos, objects[i].color);
+			vec3 intersectCoord = intersec.coord;
+
+			if(intersectCoord != D && distance(start, transformPoint(intersectCoord, objects[i].trans))<closestDist){
+				closestDist = distance(start, transformPoint(intersectCoord, objects[i].trans));
+				closestObj = objects[i];
+				closestIntersect = intersec;
+
+				vec4 illum;   
+				illum.xyz = ambientMask + 1 * (dot(lightRay, transformRay(intersec.norm, objects[i].trans)) );
+				illum.w  = 1;
+				illum = objects[i].color * illum;
+
+				imageStore(destTex, texPos, illum);
 			}
 
-			if(intersectCoord.x>=30000){
-				imageStore(destTex, texPos, vec4(1,1,0,1));
+			/*
+			if( i < 1 && approx(end, transformPoint(intersectCoord, objects[i].trans), ambientMask.xyz)){
+				imageStore(destTex, texPos, objects[i].color/2);
 			}
+			*/
+
 		}
 		isDone=true;
 	}
 
 }
+
 
 
