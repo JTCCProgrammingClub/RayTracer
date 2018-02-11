@@ -38,7 +38,7 @@ struct object{
 	//GENERAL
 	int type;
 	mat4 trans;
-} objects[3];
+} objects[5];
 
 struct intersection{
 	vec3 norm;
@@ -52,16 +52,15 @@ bool approx(vec3 val, vec3 compare, vec3 maxDiff){
 }
 
 vec3 transformPoint(vec3 vec, mat4 trans){
-
 	vec4 vecTrans = vec4(vec.x, vec.y, vec.z, 1);
 	return ((trans) * vecTrans).xyz;
 }
 
 vec3 transformRay(vec3 ray, mat4 trans){
-
 	vec4 rayTrans = vec4(ray.x, ray.y, ray.z, 0);
 	return (inverse(transpose((trans))) * rayTrans).xyz;
 }
+
 
 intersection intersectPlane(vec3 D, vec3 E){
 	vec3 ray = normalize(D - E); // Ray's direction
@@ -69,12 +68,10 @@ intersection intersectPlane(vec3 D, vec3 E){
 	vec3 N = (vec3(0,1,0));
 	vec3 Q = (vec3(0,0,0));
 
-	float d = -dot(Q, N);
-	float v = dot(ray, N);
-	float t = (-(dot(E, N) + d) / v);
+	float t = dot(N, Q-E)/dot(N,D);
 	intersection intersec = intersection(D,D);
 
-	if(t>0){
+	if(t>0.001 ){
 		intersec.coord =  E + t*D;
 		intersec.norm = normalize(N);
 	}
@@ -82,24 +79,25 @@ intersection intersectPlane(vec3 D, vec3 E){
 }
 
 intersection intersectSphere(vec3 D, vec3 E){
-	vec3 ray = normalize(D-E);
-	float a = dot(ray,ray);
-	float b = 2*dot(E,ray);
-	float c = dot(E,E)-1;
+
 	intersection intersec = intersection(D,D);
 
-	float t1 =  (-b + sqrt(b*b -4*a*c))/2*a;
-	float t2 =  (-b - sqrt(b*b -4*a*c))/2*a;
+	vec3 rd = normalize(D-E);
 
-	if(b*b -4*a*c < 0.0){
-		return intersec;
-	}
-	else if(b*b -4*a*c == 0.0){
-		intersec.coord =  (t1 > t2) ? E + t2*D : E + t1*D;
-		intersec.norm  = normalize(intersec.coord);
-	}
-	else {
-		intersec.coord =  E + t2*D;
+    float a = dot(rd, rd);
+    vec3 s0_r0 = E -vec3(0,0,0);
+
+    float b = 2.0 * dot(rd, s0_r0);
+    float c = dot(s0_r0, s0_r0) - (1 * 1);
+
+    if (b*b - 4.0*a*c < 0.0) {
+        return intersec;
+    }
+	float t = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+
+	if(t>0){
+
+		intersec.coord =  E + t*rd;
 		intersec.norm  = normalize(intersec.coord);
 	}
 	return intersec;
@@ -115,6 +113,33 @@ intersection intersectObject(vec3 D, vec3 E, int type){
 			return intersectPlane(D, E);
 
 	}
+}
+
+intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
+
+	float closestDist = 100000;
+	closestObj.type = -1;
+	intersection  closestIntersect;
+
+	for(int i=0; i< objects.length; i++){
+
+		// Transform vectors in object's space to prep for testing
+		vec3 E = transformPoint(start, inverse(objects[i].trans));
+		vec3 D = transformPoint(end, inverse(objects[i].trans));
+
+		intersection intersec = intersectObject(D, E, objects[i].type);
+
+		vec3 intersectCoord = intersec.coord;
+
+		if(intersectCoord != D &&  distance(start, transformPoint(intersectCoord, objects[i].trans))<closestDist &&
+				distance(start, transformPoint(intersectCoord, objects[i].trans))>.005){
+
+			closestDist = distance(start, transformPoint(intersectCoord, objects[i].trans));
+			closestObj = objects[i];
+			closestIntersect = intersec;
+		}
+	}
+	return closestIntersect;
 }
 
 void main() {
@@ -157,25 +182,35 @@ void main() {
 	vec3 start = mix(mix(start00.xyz, start01.xyz, pos.y), mix(start10.xyz, start11.xyz, pos.y), pos.x).xyz;
 	vec3 end = mix(mix(end00.xyz, end01.xyz, pos.y), mix(end10.xyz, end11.xyz, pos.y), pos.x).xyz;
 
-	end = start + 1000*normalize(end - start);
+	end = start + 400*normalize(end - start);
 
-	mat4 trans1 = (transpose(mat4(1.0, 0.0, 0.0, 1.0, 
-										  0.0, 2.0, 0.0, 1.0, 
-										  0.0, 0.0, 1.0,  3.0,  
+	mat4 trans1 = (transpose(mat4(1.0, 0.0, 0.0, 2.0, 
+										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
-	mat4 trans2 = (transpose(mat4(2.0, 0.0, 0.0, 0.0, 
+	mat4 trans2 = (transpose(mat4(1.0, 0.0, 0.0, -2.0, 
 										  0.0, 1.0, 0.0, -1.0, 
-										  0.0, 0.0, 1.0,  1.0,  
+										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
 	mat4 trans3 = (transpose(mat4(1.0, 0.0, 0.0, 0.0, 
 										  0.0, 1.0, 0.0, -1.0, 
 										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
+
+	mat4 trans4 = (transpose(mat4(1.0, 0.0, 0.0, 0.0, 
+										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 0.0, 1.0,  2.0,  
+										  0.0, 0.0, 0.0,  1.0)));
+
+	mat4 trans5 = (transpose(mat4(1.0, 0.0, 0.0, 0.0, 
+										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 0.0, 1.0,  -2.0,  
+										  0.0, 0.0, 0.0,  1.0)));
 	objects[0].type =1;
 	objects[0].trans =trans1;
-	objects[0].color = vec4(1,0,1,1);
+	objects[0].color = vec4(0,0,1,1);
 
 	objects[1].type =1;
 	objects[1].trans =trans2;
@@ -185,57 +220,75 @@ void main() {
 	objects[2].trans =trans3;
 	objects[2].color = vec4(1,0,1,1);
 
+	objects[3].type =1;
+	objects[3].trans =trans4;
+	objects[3].color = vec4(0,0,1,1);
+
+	objects[4].type =1;
+	objects[4].trans =trans5;
+	objects[4].color = vec4(0,0,1,1);
+
 	// Color sky
 	imageStore(destTex, texPos, vec4(.22,.67,0.9,1));
 
 	int currReflect = 0;
-	int maxReflect = 4;
+	int maxReflect = 8;
 	bool isDone = false;
-	float closestDist = 100000;
+
+	vec3 ambientMask = vec3(.15, .15, .15);
+	vec3 lightRay = normalize(vec3(-1,1,-1));
+
 	object closestObj;
 	closestObj.type = -1;
 	intersection  closestIntersect;
+	vec4 accumColor =vec4(0,0,0,1);
 
-	vec3 ambientMask = vec3(.2, .2, .2);
-	vec3 lightRay = normalize(vec3(1,1,0));
+	vec3 currEnd = end;
+	vec3 currStart = start;
 
 	while(currReflect < maxReflect && !isDone){
 
-		//Test every object in scene, if intersect with current ray
-		for(int i=0; i< objects.length; i++){
+		closestIntersect = nearestPoint(currEnd, currStart, closestObj);
 
-			// Transform vectors in object's space to prep for testing
-			vec3 E = transformPoint(start, inverse(objects[i].trans));
-			vec3 D = transformPoint(end, inverse(objects[i].trans));
+		vec4 illum;   
+		illum.w  = 1;
 
-			intersection intersec = intersectObject(D, E, objects[i].type);
+		if(closestObj.type != -1){
 
-			vec3 intersectCoord = intersec.coord;
+			// Test if under shadow
+			object closestObjShadow;
+			intersection  closestIntersectShadow;
 
-			if(intersectCoord != D && distance(start, transformPoint(intersectCoord, objects[i].trans))<closestDist){
-				closestDist = distance(start, transformPoint(intersectCoord, objects[i].trans));
-				closestObj = objects[i];
-				closestIntersect = intersec;
+			vec3 E = transformPoint(closestIntersect.coord, (closestObj.trans));
+			vec3 D = E+ 400*lightRay;
 
-				vec4 illum;   
-				illum.xyz = ambientMask + 1 * (dot(lightRay, transformRay(intersec.norm, objects[i].trans)) );
-				illum.w  = 1;
-				illum = objects[i].color * illum;
+			closestIntersectShadow = nearestPoint(D, E, closestObjShadow);
 
-				imageStore(destTex, texPos, illum);
-			}
+
+			if(closestObjShadow.type == -1 )
+				illum.xyz = ambientMask + ((1 * (dot(lightRay, transformRay(closestIntersect.norm, closestObj.trans)) ))+1)/2;
+			else
+				illum.xyz = ambientMask;
+
+			illum = closestObj.color * illum;
 
 			/*
-			if( i < 1 && approx(end, transformPoint(intersectCoord, objects[i].trans), ambientMask.xyz)){
-				imageStore(destTex, texPos, objects[i].color/2);
-			}
+			if(E.x < -0.1){
+				imageStore(destTex, texPos, vec4(1,1,1,1));
 			*/
-
 		}
-		isDone=true;
+		else{
+			illum = vec4(.22,.67,0.9,1);
+		}
+
+		accumColor += (currReflect < 1) ? illum : illum*(1/currReflect);
+
+		currStart =  closestIntersect.coord;// d- 2(d*n)*n;
+		currEnd  = currStart  + 400*(normalize(currEnd - currStart) -2*(dot(normalize(currEnd - currStart), closestIntersect.norm) * closestIntersect.norm));
+
+		currReflect++;
+		//isDone=true;
+		imageStore(destTex, texPos, accumColor);
 	}
-
 }
-
-
 
