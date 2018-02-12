@@ -32,13 +32,19 @@ struct object{
 	//MATERIAL
 	// TODO: Refraction, texture
 	vec4 color;
-	vec4 reflectivity;
-	vec4 specularity;
+	float reflectivity;
+	float specularity;
 
 	//GENERAL
 	int type;
 	mat4 trans;
 } objects[5];
+
+struct light{
+	bool directional;
+	vec3 position;
+
+} lights[1];
 
 struct intersection{
 	vec3 norm;
@@ -58,7 +64,7 @@ vec3 transformPoint(vec3 vec, mat4 trans){
 
 vec3 transformRay(vec3 ray, mat4 trans){
 	vec4 rayTrans = vec4(ray.x, ray.y, ray.z, 0);
-	return (inverse(transpose((trans))) * rayTrans).xyz;
+	return (transpose(inverse((trans))) * rayTrans).xyz;
 }
 
 
@@ -104,6 +110,55 @@ intersection intersectSphere(vec3 D, vec3 E){
 
 }
 
+intersection intersectCylinder(vec3 D, vec3 E){
+	intersection intersec = intersection(D,D);
+	vec3 ray = normalize(D-E);
+
+	float a = dot(ray.xy, ray.xy);
+	float b = 2*dot(E.xy, ray.xy);
+	float c = dot(E.xy, E.xy) -1;
+
+    if (b*b - 4.0*a*c < 0.0) {
+        return intersec;
+    }
+	float t = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+
+	if(t>0){
+		vec3 line = (E + t*ray);
+		if( line.z <= 1 &&  line.z >= -1 ){
+			intersec.coord =  E + t*ray;
+			intersec.norm  = normalize(intersec.coord);
+		}
+	}
+	return intersec;
+
+}
+
+intersection intersectCone(vec3 D, vec3 E){
+	intersection intersec = intersection(D,D);
+
+	vec3 ray = normalize(D-E);
+	//ray.z = -ray.z;
+	//E.z = -E.z;
+
+	float a = dot(ray.xy, ray.xy) - ray.z*ray.z;
+	float b = 2*dot(E.xy, ray.xy) - 2*E.z*ray.z;
+	float c = dot(E.xy, E.xy) - E.z*E.z;
+
+    if (b*b - 4.0*a*c < 0.0) {
+        return intersec;
+    }
+	float t = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+
+	vec3 line = (E + t*ray);
+	if(t>0 && line.z >0 && line.z < 1){
+			intersec.coord =  E + t*ray;
+			intersec.norm  = normalize(intersec.coord);
+	}
+	return intersec;
+
+}
+
 intersection intersectObject(vec3 D, vec3 E, int type){
 
 	switch(type){
@@ -111,7 +166,10 @@ intersection intersectObject(vec3 D, vec3 E, int type){
 			return intersectSphere(D, E);
 		case 2:
 			return intersectPlane(D, E);
-
+		case 3:
+			return intersectCylinder(D, E);
+		case 4:
+			return intersectCone(D, E);
 	}
 }
 
@@ -130,6 +188,7 @@ intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 		intersection intersec = intersectObject(D, E, objects[i].type);
 
 		vec3 intersectCoord = intersec.coord;
+
 
 		if(intersectCoord != D &&  distance(start, transformPoint(intersectCoord, objects[i].trans))<closestDist &&
 				distance(start, transformPoint(intersectCoord, objects[i].trans))>.005){
@@ -185,12 +244,12 @@ void main() {
 	end = start + 400*normalize(end - start);
 
 	mat4 trans1 = (transpose(mat4(1.0, 0.0, 0.0, 2.0, 
-										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 1.0, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
 	mat4 trans2 = (transpose(mat4(1.0, 0.0, 0.0, -2.0, 
-										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 1.0, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
@@ -200,43 +259,57 @@ void main() {
 										  0.0, 0.0, 0.0,  1.0)));
 
 	mat4 trans4 = (transpose(mat4(1.0, 0.0, 0.0, 0.0, 
-										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 1.0, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  2.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
 	mat4 trans5 = (transpose(mat4(1.0, 0.0, 0.0, 0.0, 
-										  0.0, 1.0, 0.0, -1.0, 
+										  0.0, 1.0, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  -2.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 	objects[0].type =1;
 	objects[0].trans =trans1;
-	objects[0].color = vec4(0,0,1,1);
+	objects[0].color = vec4(0,0,0,1);
+	objects[0].reflectivity = 1;
+	objects[0].specularity = 1;
 
 	objects[1].type =1;
 	objects[1].trans =trans2;
 	objects[1].color = vec4(0,0,1,1);
+	objects[1].reflectivity = 1;
+	objects[1].specularity = 0;
 
 	objects[2].type =2;
 	objects[2].trans =trans3;
-	objects[2].color = vec4(1,0,1,1);
+	objects[2].color = vec4(1,1,1,1);
+	objects[2].reflectivity = 1;
+	objects[2].specularity = 1;
 
 	objects[3].type =1;
 	objects[3].trans =trans4;
 	objects[3].color = vec4(0,0,1,1);
+	objects[3].reflectivity = 1;
+	objects[3].specularity = 1;
 
 	objects[4].type =1;
 	objects[4].trans =trans5;
 	objects[4].color = vec4(0,0,1,1);
+	objects[4].reflectivity = 1;
+	objects[4].specularity = 0;
+
 
 	// Color sky
 	imageStore(destTex, texPos, vec4(.22,.67,0.9,1));
 
 	int currReflect = 0;
-	int maxReflect = 8;
+	int maxReflect = 16;
 	bool isDone = false;
 
 	vec3 ambientMask = vec3(.15, .15, .15);
-	vec3 lightRay = normalize(vec3(-1,1,-1));
+	vec3 lightRay = (vec3(0,2,0));
+
+	lights[0].directional= true;
+	lights[0].position = lightRay;
 
 	object closestObj;
 	closestObj.type = -1;
@@ -259,36 +332,52 @@ void main() {
 			object closestObjShadow;
 			intersection  closestIntersectShadow;
 
+
 			vec3 E = transformPoint(closestIntersect.coord, (closestObj.trans));
+
+			if(lights[0].directional)
+				lightRay = normalize(lights[0].position - E);
+			else
+				lightRay = normalize(lightRay);
+
 			vec3 D = E+ 400*lightRay;
 
 			closestIntersectShadow = nearestPoint(D, E, closestObjShadow);
 
 
-			if(closestObjShadow.type == -1 )
-				illum.xyz = ambientMask + ((1 * (dot(lightRay, transformRay(closestIntersect.norm, closestObj.trans)) ))+1)/2;
-			else
+			vec3 N = transformRay(closestIntersect.norm, closestObj.trans); 
+			vec3 H =((-1*lightRay + normalize(E - currStart)))/length((-1*lightRay + normalize(E - currStart)));
+			float spec;
+
+			if(closestObjShadow.type == -1 ){
+				illum.xyz = ambientMask + ((1 * (dot(lightRay, N))+0 ));
+				spec = pow((1-dot(N, H))*.5, 64)*closestObj.specularity;
+			}else{
 				illum.xyz = ambientMask;
+				spec = 0;
+			}
+			float attent = (lights[0].directional) ? (lights[0].position - E).length:1;
+			illum = ((closestObj.color * illum ) + spec)/attent*1;
 
-			illum = closestObj.color * illum;
+			//isDone = true;
 
-			/*
-			if(E.x < -0.1){
-				imageStore(destTex, texPos, vec4(1,1,1,1));
-			*/
+			if(closestObj.reflectivity >0){
+				currEnd  = E + 400*(normalize(E - currStart) -2*(dot(normalize(E  - currStart), closestIntersect.norm) * closestIntersect.norm));
+				currStart =  E;// d- 2(d*n)*n;
+			}
 		}
 		else{
 			illum = vec4(.22,.67,0.9,1);
+			isDone = true;
 		}
 
-		accumColor += (currReflect < 1) ? illum : illum*(1/currReflect);
+		accumColor += (currReflect < 1) ? illum : illum*.3/currReflect;
 
-		currStart =  closestIntersect.coord;// d- 2(d*n)*n;
-		currEnd  = currStart  + 400*(normalize(currEnd - currStart) -2*(dot(normalize(currEnd - currStart), closestIntersect.norm) * closestIntersect.norm));
 
 		currReflect++;
 		//isDone=true;
-		imageStore(destTex, texPos, accumColor);
 	}
+	imageStore(destTex, texPos, accumColor);
 }
+
 

@@ -7,7 +7,7 @@
 const unsigned int WIN_WIDTH = 512;
 const unsigned int WIN_HEIGHT = 512;
 
-const int COMP_SIZE = 2048;
+const int COMP_SIZE = 1024;
 
 //Texture initialization
 //GLuint tex;
