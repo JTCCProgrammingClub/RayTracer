@@ -1,4 +1,9 @@
 #version 430
+
+/* TODO:
+quadratic function DRYness
+*/
+
 precision highp float;
 precision highp int;
 
@@ -16,6 +21,7 @@ layout(std140, binding = 2) uniform camData
 
 mat4 invViewProjMat; 
 
+// border rays used in interpolation to current ray
 vec4 start00; 
 vec4 start10; 
 
@@ -27,6 +33,8 @@ vec4 end10;
 
 vec4 end01; 
 vec4 end11; 
+
+float clipDist = 400; // Max distance
 
 struct object{
 	//MATERIAL
@@ -49,19 +57,18 @@ struct light{
 struct intersection{
 	vec3 norm;
 	vec3 coord;
+	float distance;
 };
 
-layout (local_size_x = 1, local_size_y = 1) in;
+layout (local_size_x = 8, local_size_y = 8) in;
 
-bool approx(vec3 val, vec3 compare, vec3 maxDiff){
-	return all(lessThan( abs(val - compare) , maxDiff));
-}
-
+// Transforms a point in space given matrix
 vec3 transformPoint(vec3 vec, mat4 trans){
 	vec4 vecTrans = vec4(vec.x, vec.y, vec.z, 1);
 	return ((trans) * vecTrans).xyz;
 }
 
+// Transforms a "ray" in space given matrix (no translation applied)
 vec3 transformRay(vec3 ray, mat4 trans){
 	vec4 rayTrans = vec4(ray.x, ray.y, ray.z, 0);
 	return (transpose(inverse((trans))) * rayTrans).xyz;
@@ -71,63 +78,77 @@ vec3 transformRay(vec3 ray, mat4 trans){
 intersection intersectPlane(vec3 D, vec3 E){
 	vec3 ray = normalize(D - E); // Ray's direction
 
-	vec3 N = (vec3(0,1,0));
+	vec3 N = normalize(vec3(0,1,0));
 	vec3 Q = (vec3(0,0,0));
 
+	// init default values, if still same, no intersection
+	intersection intersec;
+	intersec.distance = clipDist;
+	intersec.coord = D;
+
+	// Calc intersection point along ray
 	float t = dot(N, Q-E)/dot(N,D);
-	intersection intersec = intersection(D,D);
 
 	if(t>0.001 ){
 		intersec.coord =  E + t*D;
-		intersec.norm = normalize(N);
+		intersec.norm = N;
+		intersec.distance = t;
 	}
 	return intersec;
 }
 
 intersection intersectSphere(vec3 D, vec3 E){
 
-	intersection intersec = intersection(D,D);
+	vec3 ray = normalize(D-E);
 
-	vec3 rd = normalize(D-E);
+	intersection intersec;
+	intersec.distance = clipDist;
+	intersec.coord = D;
 
-    float a = dot(rd, rd);
-    vec3 s0_r0 = E -vec3(0,0,0);
+    float a = dot(ray, ray);
+    float b = 2.0 * dot(ray, E);
+    float c = dot(E, E) - 1;
 
-    float b = 2.0 * dot(rd, s0_r0);
-    float c = dot(s0_r0, s0_r0) - (1 * 1);
+	float discriminant = (b*b) - 4.0*a*c;
 
-    if (b*b - 4.0*a*c < 0.0) {
-        return intersec;
-    }
-	float t = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+    if (discriminant > 0.0){ // negative discriminant means no real intersection
 
-	if(t>0){
+		float t = (-b - sqrt(discriminant))/(2.0*a);
 
-		intersec.coord =  E + t*rd;
-		intersec.norm  = normalize(intersec.coord);
+		if(t>0.001){
+			intersec.coord =  E + t*ray;
+			intersec.norm  = normalize(intersec.coord);
+			intersec.distance = t;
+		}
 	}
 	return intersec;
 
 }
 
 intersection intersectCylinder(vec3 D, vec3 E){
-	intersection intersec = intersection(D,D);
+	intersection intersec;
+	intersec.distance = clipDist;
+	intersec.coord = D;
+
 	vec3 ray = normalize(D-E);
 
 	float a = dot(ray.xy, ray.xy);
 	float b = 2*dot(E.xy, ray.xy);
 	float c = dot(E.xy, E.xy) -1;
 
-    if (b*b - 4.0*a*c < 0.0) {
-        return intersec;
-    }
-	float t = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+	float discriminant = b*b - 4.0*a*c;
 
-	if(t>0){
-		vec3 line = (E + t*ray);
-		if( line.z <= 1 &&  line.z >= -1 ){
-			intersec.coord =  E + t*ray;
-			intersec.norm  = normalize(intersec.coord);
+    if (discriminant > 0.0) {
+
+		float t = (-b - sqrt(discriminant))/(2.0*a);
+
+		if(t>0.001){
+			vec3 line = (E + t*ray);
+			if( line.z <= 1 &&  line.z >= -1 ){
+				intersec.coord =  E + t*ray;
+				intersec.norm  = normalize(intersec.coord);
+				intersec.distance = t;
+			}
 		}
 	}
 	return intersec;
@@ -135,25 +156,27 @@ intersection intersectCylinder(vec3 D, vec3 E){
 }
 
 intersection intersectCone(vec3 D, vec3 E){
-	intersection intersec = intersection(D,D);
+	intersection intersec;
+	intersec.distance = clipDist;
+	intersec.coord = D;
 
 	vec3 ray = normalize(D-E);
-	//ray.z = -ray.z;
-	//E.z = -E.z;
 
 	float a = dot(ray.xy, ray.xy) - ray.z*ray.z;
 	float b = 2*dot(E.xy, ray.xy) - 2*E.z*ray.z;
 	float c = dot(E.xy, E.xy) - E.z*E.z;
 
-    if (b*b - 4.0*a*c < 0.0) {
-        return intersec;
-    }
-	float t = (-b - sqrt((b*b) - 4.0*a*c))/(2.0*a);
+	float discriminant = b*b - 4.0*a*c;
 
-	vec3 line = (E + t*ray);
-	if(t>0 && line.z >0 && line.z < 1){
+    if (discriminant > 0.0) {
+		float t = (-b - sqrt(discriminant))/(2.0*a);
+
+		vec3 line = (E + t*ray);
+		if(t>0 && line.z >0 && line.z < 1){
 			intersec.coord =  E + t*ray;
 			intersec.norm  = normalize(intersec.coord);
+			intersec.distance = t;
+		}
 	}
 	return intersec;
 
@@ -175,7 +198,7 @@ intersection intersectObject(vec3 D, vec3 E, int type){
 
 intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 
-	float closestDist = 100000;
+	float closestDist = 1000000;
 	closestObj.type = -1;
 	intersection  closestIntersect;
 
@@ -187,22 +210,23 @@ intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 
 		intersection intersec = intersectObject(D, E, objects[i].type);
 
-		vec3 intersectCoord = intersec.coord;
+		if(intersec.coord != D ){ // If an intersection has been made
 
+			// Get object data, convert back to world coords
+			vec3 objIntersectCoord = transformPoint(intersec.coord, objects[i].trans);
+			float objIntersectDist = distance(start, objIntersectCoord);
 
-		if(intersectCoord != D &&  distance(start, transformPoint(intersectCoord, objects[i].trans))<closestDist &&
-				distance(start, transformPoint(intersectCoord, objects[i].trans))>.005){
-
-			closestDist = distance(start, transformPoint(intersectCoord, objects[i].trans));
-			closestObj = objects[i];
-			closestIntersect = intersec;
+			if(objIntersectDist < closestDist && objIntersectDist > .005){
+				closestDist = objIntersectDist;
+				closestObj = objects[i];
+				closestIntersect = intersec;
+			}
 		}
 	}
 	return closestIntersect;
 }
 
 void main() {
-
 
 	// CALCULATION OF RAY TO BE EVAULUATED
 	invViewProjMat = inverse(proj * view);
@@ -222,6 +246,7 @@ void main() {
 	start11.xyz /= start11.w;
 
 	end00 =  invViewProjMat * vec4(-1.0, -1.0, 1.0, 1.0);
+ 
 	end00.xyz /= end00.w;
 
 	end01 =  invViewProjMat * vec4(-1.0, 1.0, 1.0, 1.0);
@@ -241,7 +266,7 @@ void main() {
 	vec3 start = mix(mix(start00.xyz, start01.xyz, pos.y), mix(start10.xyz, start11.xyz, pos.y), pos.x).xyz;
 	vec3 end = mix(mix(end00.xyz, end01.xyz, pos.y), mix(end10.xyz, end11.xyz, pos.y), pos.x).xyz;
 
-	end = start + 400*normalize(end - start);
+	end = start + clipDist*normalize(end - start);
 
 	mat4 trans1 = (transpose(mat4(1.0, 0.0, 0.0, 2.0, 
 										  0.0, 1.0, 0.0, 0.5, 
@@ -249,7 +274,7 @@ void main() {
 										  0.0, 0.0, 0.0,  1.0)));
 
 	mat4 trans2 = (transpose(mat4(1.0, 0.0, 0.0, -2.0, 
-										  0.0, 1.0, 0.0, 0.5, 
+										  0.0, roll, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
@@ -267,6 +292,7 @@ void main() {
 										  0.0, 1.0, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  -2.0,  
 										  0.0, 0.0, 0.0,  1.0)));
+
 	objects[0].type =1;
 	objects[0].trans =trans1;
 	objects[0].color = vec4(0,0,0,1);
@@ -297,27 +323,28 @@ void main() {
 	objects[4].reflectivity = 1;
 	objects[4].specularity = 0;
 
-
 	// Color sky
 	imageStore(destTex, texPos, vec4(.22,.67,0.9,1));
 
 	int currReflect = 0;
 	int maxReflect = 16;
-	bool isDone = false;
 
 	vec3 ambientMask = vec3(.15, .15, .15);
-	vec3 lightRay = (vec3(0,2,0));
 
+	vec3 lightRay=vec3(0,1,0);
 	lights[0].directional= true;
 	lights[0].position = lightRay;
+
+	vec4 accumColor =vec4(0,0,0,1);
 
 	object closestObj;
 	closestObj.type = -1;
 	intersection  closestIntersect;
-	vec4 accumColor =vec4(0,0,0,1);
 
 	vec3 currEnd = end;
 	vec3 currStart = start;
+
+	bool isDone = false;
 
 	while(currReflect < maxReflect && !isDone){
 
@@ -332,22 +359,22 @@ void main() {
 			object closestObjShadow;
 			intersection  closestIntersectShadow;
 
-
 			vec3 E = transformPoint(closestIntersect.coord, (closestObj.trans));
 
 			if(lights[0].directional)
 				lightRay = normalize(lights[0].position - E);
 			else
-				lightRay = normalize(lightRay);
+				lightRay = normalize(lights[0].position);
 
-			vec3 D = E+ 400*lightRay;
+			vec3 D = E+ clipDist*lightRay;
 
 			closestIntersectShadow = nearestPoint(D, E, closestObjShadow);
 
-
+			// Variables for light calculation
 			vec3 N = transformRay(closestIntersect.norm, closestObj.trans); 
 			vec3 H =((-1*lightRay + normalize(E - currStart)))/length((-1*lightRay + normalize(E - currStart)));
-			float spec;
+
+			float spec; // shininess, specularity
 
 			if(closestObjShadow.type == -1 ){
 				illum.xyz = ambientMask + ((1 * (dot(lightRay, N))+0 ));
@@ -356,14 +383,15 @@ void main() {
 				illum.xyz = ambientMask;
 				spec = 0;
 			}
-			float attent = (lights[0].directional) ? (lights[0].position - E).length:1;
+
+			float attent = (lights[0].directional) ? (lights[0].position - E).length:1; // Light's decreasing brightness relative to distance
 			illum = ((closestObj.color * illum ) + spec)/attent*1;
 
-			//isDone = true;
-
 			if(closestObj.reflectivity >0){
-				currEnd  = E + 400*(normalize(E - currStart) -2*(dot(normalize(E  - currStart), closestIntersect.norm) * closestIntersect.norm));
-				currStart =  E;// d- 2(d*n)*n;
+				currEnd  = E + clipDist*(normalize(E - currStart) 
+					-2*(dot(normalize(E  - currStart), closestIntersect.norm) * closestIntersect.norm)); // Calc reflect vector
+
+				currStart =  E;
 			}
 		}
 		else{
@@ -372,12 +400,10 @@ void main() {
 		}
 
 		accumColor += (currReflect < 1) ? illum : illum*.3/currReflect;
-
-
 		currReflect++;
-		//isDone=true;
 	}
 	imageStore(destTex, texPos, accumColor);
 }
+
 
 

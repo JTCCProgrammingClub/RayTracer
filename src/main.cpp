@@ -75,10 +75,10 @@ int main()
 }
 
 void useRayTracerProg(){
+	i+=.01f;
 	glUseProgram(rayTracerProg);
-	i+=.1f;
 
-	glUniform1i(glGetUniformLocation(rayTracerProg, "roll"),1);
+	glUniform1i(glGetUniformLocation(rayTracerProg, "roll"),i);
 	glDispatchCompute(COMP_SIZE, COMP_SIZE, 1); // 
 }
 
