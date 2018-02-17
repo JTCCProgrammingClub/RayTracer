@@ -55,8 +55,21 @@ int main()
 	// init render prog
 	renderProg  = genRenderProg();	
 
+	double lastTime = glfwGetTime();
+	int nbFrames = 0;
+
     while (!glfwWindowShouldClose(window))
     {
+		// Measure speed
+		double currentTime = glfwGetTime();
+		nbFrames++;
+		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
+			// printf and reset timer
+			printf("%f fps\n", double(nbFrames));
+			nbFrames = 0;
+			lastTime += 1.0;
+		}
+
         processInput(window);
         //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         //glClear(GL_COLOR_BUFFER_BIT);
@@ -75,10 +88,10 @@ int main()
 }
 
 void useRayTracerProg(){
-	i+=.01f;
 	glUseProgram(rayTracerProg);
+	i+=.1f;
 
-	glUniform1i(glGetUniformLocation(rayTracerProg, "roll"),i);
+	glUniform1f(glGetUniformLocation(rayTracerProg, "roll"),(sin(i)+1)/2);
 	glDispatchCompute(COMP_SIZE, COMP_SIZE, 1); // 
 }
 

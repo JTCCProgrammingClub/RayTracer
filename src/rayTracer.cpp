@@ -8,7 +8,7 @@
 #include <glm/gtc/type_ptr.hpp> 
 
 struct camData{
-	glm::vec4 camPos = glm::vec4(5.0f, 10.0, 9.0f, 1.0f);
+	glm::vec4 camPos = glm::vec4(10.0f, 5.5, 5.0f, 1.0f);
 	glm::mat4 view = glm::lookAt(camPos.xyz(),
 		glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Cam is 1.63 units in the air, 10 units away from origin, looking at the origin
 		glm::mat4 proj = glm::perspective( glm::radians(45.0f), 1.0f/1, 0.1f, 10.0f); //May nned to fix aspect ratio

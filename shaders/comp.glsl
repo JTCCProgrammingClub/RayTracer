@@ -7,7 +7,7 @@ quadratic function DRYness
 precision highp float;
 precision highp int;
 
-uniform int roll;
+uniform float roll;
 
 // What this shader will write to
 layout(rgba32f, binding = 0) uniform image2D destTex;
@@ -34,9 +34,12 @@ vec4 end10;
 vec4 end01; 
 vec4 end11; 
 
-float clipDist = 400; // Max distance
+float clipDist = 100; // Max distance
 
-struct object{
+float EPSILON = .0001;
+float minDist = EPSILON;
+
+shared struct object{
 	//MATERIAL
 	// TODO: Refraction, texture
 	vec4 color;
@@ -48,7 +51,7 @@ struct object{
 	mat4 trans;
 } objects[5];
 
-struct light{
+shared struct light{
 	bool directional;
 	vec3 position;
 
@@ -75,126 +78,72 @@ vec3 transformRay(vec3 ray, mat4 trans){
 }
 
 
-intersection intersectPlane(vec3 D, vec3 E){
-	vec3 ray = normalize(D - E); // Ray's direction
-
-	vec3 N = normalize(vec3(0,1,0));
-	vec3 Q = (vec3(0,0,0));
-
-	// init default values, if still same, no intersection
-	intersection intersec;
-	intersec.distance = clipDist;
-	intersec.coord = D;
-
-	// Calc intersection point along ray
-	float t = dot(N, Q-E)/dot(N,D);
-
-	if(t>0.001 ){
-		intersec.coord =  E + t*D;
-		intersec.norm = N;
-		intersec.distance = t;
-	}
-	return intersec;
+float intersectPlane( vec3 E){
+	vec3 n  = normalize(vec3(0,1,0));
+	return dot(E,n.xyz) + ((roll*2)-1)*sin(E.x)*sin(E.z);
 }
 
-intersection intersectSphere(vec3 D, vec3 E){
 
-	vec3 ray = normalize(D-E);
-
-	intersection intersec;
-	intersec.distance = clipDist;
-	intersec.coord = D;
-
-    float a = dot(ray, ray);
-    float b = 2.0 * dot(ray, E);
-    float c = dot(E, E) - 1;
-
-	float discriminant = (b*b) - 4.0*a*c;
-
-    if (discriminant > 0.0){ // negative discriminant means no real intersection
-
-		float t = (-b - sqrt(discriminant))/(2.0*a);
-
-		if(t>0.001){
-			intersec.coord =  E + t*ray;
-			intersec.norm  = normalize(intersec.coord);
-			intersec.distance = t;
-		}
-	}
-	return intersec;
-
+float intersectSphere( vec3 E){
+	return length(E)-1 ;
 }
 
-intersection intersectCylinder(vec3 D, vec3 E){
-	intersection intersec;
-	intersec.distance = clipDist;
-	intersec.coord = D;
+float intersectCylinder( vec3 E){
+	float h =2;
 
-	vec3 ray = normalize(D-E);
-
-	float a = dot(ray.xy, ray.xy);
-	float b = 2*dot(E.xy, ray.xy);
-	float c = dot(E.xy, E.xy) -1;
-
-	float discriminant = b*b - 4.0*a*c;
-
-    if (discriminant > 0.0) {
-
-		float t = (-b - sqrt(discriminant))/(2.0*a);
-
-		if(t>0.001){
-			vec3 line = (E + t*ray);
-			if( line.z <= 1 &&  line.z >= -1 ){
-				intersec.coord =  E + t*ray;
-				intersec.norm  = normalize(intersec.coord);
-				intersec.distance = t;
-			}
-		}
-	}
-	return intersec;
-
+	vec2 d = abs(vec2(length(E.xz),E.y)) - h;
+	return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
 
-intersection intersectCone(vec3 D, vec3 E){
-	intersection intersec;
-	intersec.distance = clipDist;
-	intersec.coord = D;
-
-	vec3 ray = normalize(D-E);
-
-	float a = dot(ray.xy, ray.xy) - ray.z*ray.z;
-	float b = 2*dot(E.xy, ray.xy) - 2*E.z*ray.z;
-	float c = dot(E.xy, E.xy) - E.z*E.z;
-
-	float discriminant = b*b - 4.0*a*c;
-
-    if (discriminant > 0.0) {
-		float t = (-b - sqrt(discriminant))/(2.0*a);
-
-		vec3 line = (E + t*ray);
-		if(t>0 && line.z >0 && line.z < 1){
-			intersec.coord =  E + t*ray;
-			intersec.norm  = normalize(intersec.coord);
-			intersec.distance = t;
-		}
-	}
-	return intersec;
+float intersectCone( vec3 E){
+	vec3 c = vec3(3,1,3);
+    vec2 q = vec2( length(E.xz), E.y );
+    vec2 v = vec2( c.z*c.y/c.x, -c.z );
+    vec2 w = v - q;
+    vec2 vv = vec2( dot(v,v), v.x*v.x );
+    vec2 qv = vec2( dot(v,w), v.x*w.x );
+    vec2 d = max(qv,0.0)*qv/vv;
+    return sqrt( dot(w,w) - max(d.x,d.y) ) * sign(max(q.y*v.x-q.x*v.y,w.y));
+}
+float intersectCube( vec3 E){
+	vec3 b = vec3(1,1,1);
+	vec3 d = abs(E) - b;
+	return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+float intersectDonut(vec3 E){
+	vec2 t = vec2(1,0.5);
+	vec2 q = vec2(length(E.xz)-t.x,E.y);
+	return length(q)-t.y;
 
 }
-
-intersection intersectObject(vec3 D, vec3 E, int type){
+float intersectObject( vec3 E, int type){
 
 	switch(type){
 		case 1:
-			return intersectSphere(D, E);
+			return intersectSphere(E);
 		case 2:
-			return intersectPlane(D, E);
+			return intersectPlane(E);
 		case 3:
-			return intersectCylinder(D, E);
+			return intersectCylinder(E);
 		case 4:
-			return intersectCone(D, E);
+			return intersectCone(E);
+		case 5:
+			return intersectCube(E);
+		case 6:
+			return intersectDonut(E);
 	}
 }
+
+vec3 calcNormal(vec3 E, int type) {
+    return normalize(vec3(
+        intersectObject(vec3(E.x + EPSILON, E.y, E.z), type) - intersectObject(vec3(E.x - EPSILON, E.y, E.z), type),
+
+        intersectObject(vec3(E.x, E.y + EPSILON, E.z), type) - intersectObject(vec3(E.x, E.y - EPSILON, E.z), type),
+        intersectObject(vec3(E.x, E.y, E.z  + EPSILON), type) - intersectObject(vec3(E.x, E.y, E.z - EPSILON), type)
+    ));
+}
+
+// change input of above functions and content to match ray marching
 
 intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 
@@ -202,29 +151,46 @@ intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 	closestObj.type = -1;
 	intersection  closestIntersect;
 
+	float minDepth = clipDist;
+
 	for(int i=0; i< objects.length; i++){
 
 		// Transform vectors in object's space to prep for testing
 		vec3 E = transformPoint(start, inverse(objects[i].trans));
 		vec3 D = transformPoint(end, inverse(objects[i].trans));
 
-		intersection intersec = intersectObject(D, E, objects[i].type);
+		float currPosDepth = 0;
 
-		if(intersec.coord != D ){ // If an intersection has been made
+		vec3 currPos = E + currPosDepth*normalize(D-E);
+		vec3 finalPos = E;
 
-			// Get object data, convert back to world coords
-			vec3 objIntersectCoord = transformPoint(intersec.coord, objects[i].trans);
-			float objIntersectDist = distance(start, objIntersectCoord);
 
-			if(objIntersectDist < closestDist && objIntersectDist > .005){
-				closestDist = objIntersectDist;
-				closestObj = objects[i];
-				closestIntersect = intersec;
+		while  ( currPosDepth < clipDist){
+
+			currPos = E + currPosDepth*normalize(D-E);
+			currPosDepth += intersectObject(currPos, objects[i].type);
+
+
+			if(intersectObject(currPos, objects[i].type) < EPSILON ){
+				finalPos = currPos;
+				break;
 			}
+
+		}
+
+		if(finalPos != E && currPosDepth < minDepth){
+			//TODO apply min scale trans
+			minDepth = currPosDepth; //will need to transform this to world along with comarison
+
+			closestIntersect.coord  = finalPos;
+			closestIntersect.norm = calcNormal(currPos, objects[i].type);
+			closestObj = objects[i];
+
 		}
 	}
 	return closestIntersect;
 }
+
 
 void main() {
 
@@ -243,6 +209,7 @@ void main() {
 	start10.xyz /=  start10.w;
 
 	start11 = invViewProjMat * vec4(1.0, 1.0, -1.0, 1.0);
+
 	start11.xyz /= start11.w;
 
 	end00 =  invViewProjMat * vec4(-1.0, -1.0, 1.0, 1.0);
@@ -273,8 +240,8 @@ void main() {
 										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
-	mat4 trans2 = (transpose(mat4(1.0, 0.0, 0.0, -2.0, 
-										  0.0, roll, 0.0, 0.5, 
+	mat4 trans2 = (transpose(mat4(1.0, 0.0, 0.0, 0, 
+										  0.0, 1.0, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  0.0,  
 										  0.0, 0.0, 0.0,  1.0)));
 
@@ -295,7 +262,7 @@ void main() {
 
 	objects[0].type =1;
 	objects[0].trans =trans1;
-	objects[0].color = vec4(0,0,0,1);
+	objects[0].color = vec4(0,0,1,1);
 	objects[0].reflectivity = 1;
 	objects[0].specularity = 1;
 
@@ -307,7 +274,7 @@ void main() {
 
 	objects[2].type =2;
 	objects[2].trans =trans3;
-	objects[2].color = vec4(1,1,1,1);
+	objects[2].color = vec4(1,0,0,1);
 	objects[2].reflectivity = 1;
 	objects[2].specularity = 1;
 
@@ -327,12 +294,12 @@ void main() {
 	imageStore(destTex, texPos, vec4(.22,.67,0.9,1));
 
 	int currReflect = 0;
-	int maxReflect = 16;
+	int maxReflect = 8;
 
 	vec3 ambientMask = vec3(.15, .15, .15);
 
-	vec3 lightRay=vec3(0,1,0);
-	lights[0].directional= true;
+	vec3 lightRay=vec3(4,1,0);
+	lights[0].directional= false;
 	lights[0].position = lightRay;
 
 	vec4 accumColor =vec4(0,0,0,1);
@@ -402,7 +369,15 @@ void main() {
 		accumColor += (currReflect < 1) ? illum : illum*.3/currReflect;
 		currReflect++;
 	}
+
 	imageStore(destTex, texPos, accumColor);
+	/*
+	closestIntersect = nearestPoint(currEnd, currStart, closestObj);
+
+
+	if(closestObj.type != -1)
+		imageStore(destTex, texPos, vec4(1,0,0,1));
+	*/
 }
 
 
