@@ -194,10 +194,7 @@ main: CMakeFiles/main.dir/src/rayTracer.cpp.o
 main: CMakeFiles/main.dir/src/render.cpp.o
 main: CMakeFiles/main.dir/src/shader.cpp.o
 main: CMakeFiles/main.dir/build.make
-main: /usr/local/lib/libglfw3.a
-main: /usr/lib/librt.so
-main: /usr/lib/libm.so
-main: /usr/lib/libX11.so
+main: /usr/lib/libglfw.so.3.2
 main: CMakeFiles/main.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)

@@ -34,9 +34,9 @@ vec4 end10;
 vec4 end01; 
 vec4 end11; 
 
-float clipDist = 100; // Max distance
+float clipDist = 70; // Max distance
 
-float EPSILON = .0001;
+float EPSILON = .001;
 float minDist = EPSILON;
 
 shared struct object{
@@ -63,7 +63,8 @@ struct intersection{
 	float distance;
 };
 
-layout (local_size_x = 8, local_size_y = 8) in;
+//layout (local_size_x = 4, local_size_y = 4) in;
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Transforms a point in space given matrix
 vec3 transformPoint(vec3 vec, mat4 trans){
@@ -80,12 +81,12 @@ vec3 transformRay(vec3 ray, mat4 trans){
 
 float intersectPlane( vec3 E){
 	vec3 n  = normalize(vec3(0,1,0));
-	return dot(E,n.xyz) + ((roll*2)-1)*sin(E.x)*sin(E.z);
+	return dot(E,n.xyz) + ((roll*2)-1)/2*sin(E.x)*sin(E.z);
 }
 
 
 float intersectSphere( vec3 E){
-	return length(E)-1 ;
+	return length(E)-1.0f;
 }
 
 float intersectCylinder( vec3 E){
@@ -150,10 +151,11 @@ intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 	float closestDist = 1000000;
 	closestObj.type = -1;
 	intersection  closestIntersect;
-
 	float minDepth = clipDist;
 
+
 	for(int i=0; i< objects.length; i++){
+
 
 		// Transform vectors in object's space to prep for testing
 		vec3 E = transformPoint(start, inverse(objects[i].trans));
@@ -165,17 +167,24 @@ intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 		vec3 finalPos = E;
 
 
-		while  ( currPosDepth < clipDist){
+		int j=0;
+		while  ( j < 500 ){
+			j++;
 
 			currPos = E + currPosDepth*normalize(D-E);
-			currPosDepth += intersectObject(currPos, objects[i].type);
 
+			float dist = intersectObject(currPos, objects[i].type);
 
-			if(intersectObject(currPos, objects[i].type) < EPSILON ){
+			if(dist < EPSILON*currPosDepth){
+
 				finalPos = currPos;
 				break;
 			}
 
+			if(currPosDepth > minDepth)
+				break;
+
+			currPosDepth += dist;
 		}
 
 		if(finalPos != E && currPosDepth < minDepth){
@@ -188,6 +197,8 @@ intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 
 		}
 	}
+
+
 	return closestIntersect;
 }
 
@@ -228,7 +239,7 @@ void main() {
 	/* Calculate this local work group's ray by interpolating its x y position
 	with the frustrum's bounds */
 	ivec2 texPos = ivec2(gl_GlobalInvocationID.xy);
-	vec2 pos =  texPos / vec2(gl_NumWorkGroups.xy);
+	vec2 pos =  texPos / vec2(gl_NumWorkGroups.xy*8);
 
 	vec3 start = mix(mix(start00.xyz, start01.xyz, pos.y), mix(start10.xyz, start11.xyz, pos.y), pos.x).xyz;
 	vec3 end = mix(mix(end00.xyz, end01.xyz, pos.y), mix(end10.xyz, end11.xyz, pos.y), pos.x).xyz;
@@ -318,7 +329,9 @@ void main() {
 		closestIntersect = nearestPoint(currEnd, currStart, closestObj);
 
 		vec4 illum;   
+
 		illum.w  = 1;
+
 
 		if(closestObj.type != -1){
 
@@ -371,13 +384,6 @@ void main() {
 	}
 
 	imageStore(destTex, texPos, accumColor);
-	/*
-	closestIntersect = nearestPoint(currEnd, currStart, closestObj);
-
-
-	if(closestObj.type != -1)
-		imageStore(destTex, texPos, vec4(1,0,0,1));
-	*/
 }
 
 

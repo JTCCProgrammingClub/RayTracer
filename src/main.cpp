@@ -25,7 +25,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	glfwSwapInterval(0);
 
     // glfw window creation
     // --------------------
@@ -92,7 +92,7 @@ void useRayTracerProg(){
 	i+=.1f;
 
 	glUniform1f(glGetUniformLocation(rayTracerProg, "roll"),(sin(i)+1)/2);
-	glDispatchCompute(COMP_SIZE, COMP_SIZE, 1); // 
+	glDispatchCompute(COMP_SIZE/8, COMP_SIZE/8, 1); // 
 }
 
 void useRenderProg(){

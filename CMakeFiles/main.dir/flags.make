@@ -5,13 +5,13 @@
 # compile CXX with /usr/bin/c++
 C_FLAGS = -g  
 
-C_DEFINES = 
+C_DEFINES = -DGLFW_DLL
 
-C_INCLUDES = -isystem /usr/local/include 
+C_INCLUDES = 
 
-CXX_FLAGS = -D_GLIBCXX_DEBUG -g  
+CXX_FLAGS = -ldl -D_GLIBCXX_DEBUG -g  
 
-CXX_DEFINES = 
+CXX_DEFINES = -DGLFW_DLL
 
-CXX_INCLUDES = -isystem /usr/local/include 
+CXX_INCLUDES = 
 
