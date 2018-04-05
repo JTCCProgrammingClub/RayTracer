@@ -35,11 +35,12 @@ vec4 end01;
 vec4 end11; 
 
 float clipDist = 70; // Max distance
+vec3 ambientMask = vec3(.15, .15, .15);
 
 float EPSILON = .001;
 float minDist = EPSILON;
 
-shared struct object{
+struct object{
 	//MATERIAL
 	// TODO: Refraction, texture
 	vec4 color;
@@ -49,7 +50,11 @@ shared struct object{
 	//GENERAL
 	int type;
 	mat4 trans;
-} objects[5];
+//} objectsi[5];
+};
+
+
+layout(std430, binding = 3) buffer bodies { object objects[]; };
 
 shared struct light{
 	bool directional;
@@ -63,7 +68,6 @@ struct intersection{
 	float distance;
 };
 
-//layout (local_size_x = 4, local_size_y = 4) in;
 layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 // Transforms a point in space given matrix
@@ -81,7 +85,7 @@ vec3 transformRay(vec3 ray, mat4 trans){
 
 float intersectPlane( vec3 E){
 	vec3 n  = normalize(vec3(0,1,0));
-	return dot(E,n.xyz) + ((roll*2)-1)/2*sin(E.x)*sin(E.z);
+	return dot(E,n.xyz) + 1;
 }
 
 
@@ -270,6 +274,7 @@ void main() {
 										  0.0, 1.0, 0.0, 0.5, 
 										  0.0, 0.0, 1.0,  -2.0,  
 										  0.0, 0.0, 0.0,  1.0)));
+	/*
 
 	objects[0].type =1;
 	objects[0].trans =trans1;
@@ -300,6 +305,7 @@ void main() {
 	objects[4].color = vec4(0,0,1,1);
 	objects[4].reflectivity = 1;
 	objects[4].specularity = 0;
+*/
 
 	// Color sky
 	imageStore(destTex, texPos, vec4(.22,.67,0.9,1));
@@ -307,17 +313,21 @@ void main() {
 	int currReflect = 0;
 	int maxReflect = 8;
 
-	vec3 ambientMask = vec3(.15, .15, .15);
-
 	vec3 lightRay=vec3(4,1,0);
 	lights[0].directional= false;
 	lights[0].position = lightRay;
 
 	vec4 accumColor =vec4(0,0,0,1);
 
+	/*
 	object closestObj;
 	closestObj.type = -1;
+	*/
 	intersection  closestIntersect;
+
+	// reflec - spec - type - trans
+	object closestObj = 
+	object(vec4(0,0,0,0),0,0,-1,trans4 ); 
 
 	vec3 currEnd = end;
 	vec3 currStart = start;
@@ -336,7 +346,9 @@ void main() {
 		if(closestObj.type != -1){
 
 			// Test if under shadow
-			object closestObjShadow;
+			object closestObjShadow=
+			object(vec4(0,0,0,0),0,0,1,trans4 ); 
+
 			intersection  closestIntersectShadow;
 
 			vec3 E = transformPoint(closestIntersect.coord, (closestObj.trans));

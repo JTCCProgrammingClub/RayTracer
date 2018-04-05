@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/glad.c
+/home/xander/Code/CPP/RayTracter/RayTracer/src/glad.c
 stdio.h
 -
 stdlib.h

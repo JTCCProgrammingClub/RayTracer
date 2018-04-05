@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/xander/Documents/Code/CPP/RayTracter/RayTracer
+CMAKE_SOURCE_DIR = /home/xander/Code/CPP/RayTracter/RayTracer
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/xander/Documents/Code/CPP/RayTracter/RayTracer
+CMAKE_BINARY_DIR = /home/xander/Code/CPP/RayTracter/RayTracer
 
 # Include any dependencies generated for this target.
 include CMakeFiles/main.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/main.dir/flags.make
 
 CMakeFiles/main.dir/src/main.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/src/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/main.cpp.o -c /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main.dir/src/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/main.cpp.o -c /home/xander/Code/CPP/RayTracter/RayTracer/src/main.cpp
 
 CMakeFiles/main.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/main.cpp > CMakeFiles/main.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Code/CPP/RayTracter/RayTracer/src/main.cpp > CMakeFiles/main.dir/src/main.cpp.i
 
 CMakeFiles/main.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/main.cpp -o CMakeFiles/main.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Code/CPP/RayTracter/RayTracer/src/main.cpp -o CMakeFiles/main.dir/src/main.cpp.s
 
 CMakeFiles/main.dir/src/main.cpp.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/main.dir/src/main.cpp.o.provides.build: CMakeFiles/main.dir/src/main.
 
 CMakeFiles/main.dir/src/glad.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/glad.c.o: src/glad.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/main.dir/src/glad.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/main.dir/src/glad.c.o   -c /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/glad.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/main.dir/src/glad.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/main.dir/src/glad.c.o   -c /home/xander/Code/CPP/RayTracter/RayTracer/src/glad.c
 
 CMakeFiles/main.dir/src/glad.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/src/glad.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/glad.c > CMakeFiles/main.dir/src/glad.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/xander/Code/CPP/RayTracter/RayTracer/src/glad.c > CMakeFiles/main.dir/src/glad.c.i
 
 CMakeFiles/main.dir/src/glad.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/src/glad.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/glad.c -o CMakeFiles/main.dir/src/glad.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/xander/Code/CPP/RayTracter/RayTracer/src/glad.c -o CMakeFiles/main.dir/src/glad.c.s
 
 CMakeFiles/main.dir/src/glad.c.o.requires:
 
@@ -107,16 +107,16 @@ CMakeFiles/main.dir/src/glad.c.o.provides.build: CMakeFiles/main.dir/src/glad.c.
 
 CMakeFiles/main.dir/src/rayTracer.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/rayTracer.cpp.o: src/rayTracer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/rayTracer.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/rayTracer.cpp.o -c /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/rayTracer.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/rayTracer.cpp.o -c /home/xander/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp
 
 CMakeFiles/main.dir/src/rayTracer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/rayTracer.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp > CMakeFiles/main.dir/src/rayTracer.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp > CMakeFiles/main.dir/src/rayTracer.cpp.i
 
 CMakeFiles/main.dir/src/rayTracer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/rayTracer.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp -o CMakeFiles/main.dir/src/rayTracer.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Code/CPP/RayTracter/RayTracer/src/rayTracer.cpp -o CMakeFiles/main.dir/src/rayTracer.cpp.s
 
 CMakeFiles/main.dir/src/rayTracer.cpp.o.requires:
 
@@ -131,16 +131,16 @@ CMakeFiles/main.dir/src/rayTracer.cpp.o.provides.build: CMakeFiles/main.dir/src/
 
 CMakeFiles/main.dir/src/render.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/render.cpp.o: src/render.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/render.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/render.cpp.o -c /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/render.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/render.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/render.cpp.o -c /home/xander/Code/CPP/RayTracter/RayTracer/src/render.cpp
 
 CMakeFiles/main.dir/src/render.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/render.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/render.cpp > CMakeFiles/main.dir/src/render.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Code/CPP/RayTracter/RayTracer/src/render.cpp > CMakeFiles/main.dir/src/render.cpp.i
 
 CMakeFiles/main.dir/src/render.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/render.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/render.cpp -o CMakeFiles/main.dir/src/render.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Code/CPP/RayTracter/RayTracer/src/render.cpp -o CMakeFiles/main.dir/src/render.cpp.s
 
 CMakeFiles/main.dir/src/render.cpp.o.requires:
 
@@ -155,16 +155,16 @@ CMakeFiles/main.dir/src/render.cpp.o.provides.build: CMakeFiles/main.dir/src/ren
 
 CMakeFiles/main.dir/src/shader.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/shader.cpp.o: src/shader.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/shader.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/shader.cpp.o -c /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/xander/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/src/shader.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/main.dir/src/shader.cpp.o -c /home/xander/Code/CPP/RayTracter/RayTracer/src/shader.cpp
 
 CMakeFiles/main.dir/src/shader.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/src/shader.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.cpp > CMakeFiles/main.dir/src/shader.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/xander/Code/CPP/RayTracter/RayTracer/src/shader.cpp > CMakeFiles/main.dir/src/shader.cpp.i
 
 CMakeFiles/main.dir/src/shader.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/shader.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Documents/Code/CPP/RayTracter/RayTracer/src/shader.cpp -o CMakeFiles/main.dir/src/shader.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/xander/Code/CPP/RayTracter/RayTracer/src/shader.cpp -o CMakeFiles/main.dir/src/shader.cpp.s
 
 CMakeFiles/main.dir/src/shader.cpp.o.requires:
 
@@ -196,7 +196,7 @@ main: CMakeFiles/main.dir/src/shader.cpp.o
 main: CMakeFiles/main.dir/build.make
 main: /usr/lib/libglfw.so.3.2
 main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/xander/Code/CPP/RayTracter/RayTracer/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -217,6 +217,6 @@ CMakeFiles/main.dir/clean:
 .PHONY : CMakeFiles/main.dir/clean
 
 CMakeFiles/main.dir/depend:
-	cd /home/xander/Documents/Code/CPP/RayTracter/RayTracer && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/xander/Documents/Code/CPP/RayTracter/RayTracer /home/xander/Documents/Code/CPP/RayTracter/RayTracer /home/xander/Documents/Code/CPP/RayTracter/RayTracer /home/xander/Documents/Code/CPP/RayTracter/RayTracer /home/xander/Documents/Code/CPP/RayTracter/RayTracer/CMakeFiles/main.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/xander/Code/CPP/RayTracter/RayTracer && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/xander/Code/CPP/RayTracter/RayTracer /home/xander/Code/CPP/RayTracter/RayTracer /home/xander/Code/CPP/RayTracter/RayTracer /home/xander/Code/CPP/RayTracter/RayTracer /home/xander/Code/CPP/RayTracter/RayTracer/CMakeFiles/main.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/main.dir/depend
 
