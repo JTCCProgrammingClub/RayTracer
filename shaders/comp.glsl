@@ -158,7 +158,7 @@ intersection nearestPoint(vec3 end, vec3 start, inout object closestObj){
 	float minDepth = clipDist;
 
 
-	for(int i=0; i< objects.length; i++){
+	for(int i=0; i< 5; i++){
 
 
 		// Transform vectors in object's space to prep for testing

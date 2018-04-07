@@ -45,11 +45,12 @@ glm::mat4 trans5 = (glm::transpose(glm::mat4(1.0, 0.0, 0.0, 0.0,
 struct object{
 	// TODO: Refraction, texture
 	glm::vec4 color;
-	glm::mat4 trans;
 	float reflectivity;
 	float specularity;
 
 	int type;
+	float p1;
+	glm::mat4 trans;
 } objects[5];
 
 GLuint genScreen(){
@@ -133,7 +134,7 @@ GLuint genRayTracerProg(){
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(camData), &camData, GL_DYNAMIC_DRAW);
 
 	// Objects SSBO
-	GLuint objDataBindingPoint = 2;
+	GLuint objDataBindingPoint = 3;
 	GLuint objDataBuffer;
 
 	glUniformBlockBinding(progHandle, 3, objDataBindingPoint);
